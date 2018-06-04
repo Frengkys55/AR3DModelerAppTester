@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7240C1E7-CE7C-4EA2-B12B-39BF40380142}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>AR3DModelerAppTester</RootNamespace>
+    <AssemblyName>AR3DModelerAppTester</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Emgu.CV.World">
+      <HintPath>D:\C_Extended\Emgu\emgucv-windesktop 3.2.0.2682\bin\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageProcessor">
+      <HintPath>..\..\ImageProcessor\ImageProcessor\bin\Debug\ImageProcessor.dll</HintPath>
+    </Reference>
+    <Reference Include="IPC">
+      <HintPath>..\..\IPC\IPC\bin\Debug\IPC.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CreateNewImageTemplate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateNewImageTemplate.Designer.cs">
+      <DependentUpon>CreateNewImageTemplate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HMDModuleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HMDModuleForm.Designer.cs">
+      <DependentUpon>HMDModuleForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HUBModuleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HUBModuleForm.Designer.cs">
+      <DependentUpon>HUBModuleForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageRotator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageRotator.Designer.cs">
+      <DependentUpon>ImageRotator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Kursor3DModuleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Kursor3DModuleForm.Designer.cs">
+      <DependentUpon>Kursor3DModuleForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ModelerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModelerForm.Designer.cs">
+      <DependentUpon>ModelerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PTAMModuleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PTAMModuleForm.Designer.cs">
+      <DependentUpon>PTAMModuleForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ThreadHelperClass.cs" />
+    <EmbeddedResource Include="CreateNewImageTemplate.resx">
+      <DependentUpon>CreateNewImageTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HMDModuleForm.resx">
+      <DependentUpon>HMDModuleForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageRotator.resx">
+      <DependentUpon>ImageRotator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Kursor3DModuleForm.resx">
+      <DependentUpon>Kursor3DModuleForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModelerForm.resx">
+      <DependentUpon>ModelerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Kantai Collecton %2813%29.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\One_of_My_Project.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GambarTidakTersedia.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\untitled.png" />
+    <Content Include="Sources\One_of_My_Project.ico" />
+    <Content Include="x86\concrt140.dll" />
+    <Content Include="x86\cvextern.dll" />
+    <Content Include="x86\msvcp140.dll" />
+    <Content Include="x86\opencv_ffmpeg320.dll" />
+    <Content Include="x86\vcruntime140.dll" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
