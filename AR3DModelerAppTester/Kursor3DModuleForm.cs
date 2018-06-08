@@ -109,7 +109,9 @@ namespace AR3DModelerAppTester
                 ThreadHelperClass.SetText(this, lblStatusValue, "Now previewing image: " + Files[position]);
                 position++;
                 if (position == Files.Length)
+                {
                     position = 0;
+                }
 
                 #region Receiver threat
                 receiverThread = new Thread(ResultReceiver);
@@ -171,6 +173,7 @@ namespace AR3DModelerAppTester
         }
 
         #region Notifier threat
+        #region Sender function
         protected void SendReport(string PipeName)
         {
             try
@@ -187,9 +190,10 @@ namespace AR3DModelerAppTester
             }
             catch (Exception err)
             {
-
+                DefaultErrorWriter(err);
             }
         }
+        #endregion Sender function
         #region Receiver thread
         double x = 0;
         double y = 0;
@@ -281,6 +285,16 @@ namespace AR3DModelerAppTester
         private void Kursor3DModuleForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             iconAnimation.Abort();
+        }
+
+        void DefaultErrorWriter(Exception e)
+        {
+            Console.WriteLine("\nError found after trying to send notification to sender.\n");
+            Console.WriteLine("Line that causing the problem is:");
+            Console.WriteLine(e.Source);
+            Console.WriteLine("Below is the stack trace of the cause.");
+            Console.WriteLine(e.StackTrace);
+            Console.WriteLine("\nWish you good luck to solve it");
         }
     }
 }
