@@ -83,7 +83,7 @@ namespace AR3DModelerAppTester
 
             ThreadHelperClass.SetText(this, lblStatusValue, "Thread started. Loading images from selected folder to memory...");
 
-            // Loading images from source folder
+            #region Test image loader
             Bitmap[] sourceImage;
             string[] Files = Directory.GetFiles(source, "*.png");
             sourceImage = new Bitmap[Files.Length];
@@ -91,6 +91,7 @@ namespace AR3DModelerAppTester
             {
                 sourceImage[fileNumber] = new Bitmap(Files[fileNumber]);
             }
+            #endregion Test image loader
 
             ThreadHelperClass.SetText(this, lblStatusValue, "Images loaded. " + Files.Length + " files were added to memory");
 
@@ -98,6 +99,7 @@ namespace AR3DModelerAppTester
             MMF mappedFile = new MMF();
             mappedFile.CreateNewFile("Kursor3DSourceImage", 10000000);
             int position = 0;
+
             do
             {
                 Stopwatch overalPerformance = new Stopwatch();
@@ -109,25 +111,28 @@ namespace AR3DModelerAppTester
                 if (position == Files.Length)
                     position = 0;
 
-                // Start receiverThread
+                #region Receiver threat
                 receiverThread = new Thread(ResultReceiver);
                 receiverThread.Start();
-
+                #endregion Receiver threat
 
                 ThreadHelperClass.SetText(this, lblStatusValue, "Writing image to memory-mapped file");
 
                 // Convert image to array and save to tempImage
                 Stopwatch imageConversionWatcher = new Stopwatch();
                 imageConversionWatcher.Start();
+
+                #region Image converter
                 byte[] tempImage;
                 using (var ms = new MemoryStream())
                 {
                     sourceImage[position].Save(ms, sourceImage[position].RawFormat);
                     tempImage = ms.ToArray();
                 }
+                #endregion Image converter
+
                 imageConversionWatcher.Stop();
                 ThreadHelperClass.SetText(this, lblImageConversionPerformaceValue, imageConversionWatcher.ElapsedMilliseconds.ToString() + "ms");
-
 
                 Stopwatch MMFWatcher = new Stopwatch();
                 MMFWatcher.Start();
@@ -137,6 +142,7 @@ namespace AR3DModelerAppTester
                 ThreadHelperClass.SetText(this, lblMMFPerformanceValue, MMFWatcher.ElapsedMilliseconds.ToString() + "ms");
 
                 ThreadHelperClass.SetText(this, lblStatusValue, "File writen. Waiting for Kursor3D Module to connect");
+                
                 // Notify Kursor3D Module about the image
                 SendReport("Kursor3DImageNotifier");
 
