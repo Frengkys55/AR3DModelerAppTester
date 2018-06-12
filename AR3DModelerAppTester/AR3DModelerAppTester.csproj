@@ -114,6 +114,9 @@
     <EmbeddedResource Include="HMDModuleForm.resx">
       <DependentUpon>HMDModuleForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="HUBModuleForm.resx">
+      <DependentUpon>HUBModuleForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ImageRotator.resx">
       <DependentUpon>ImageRotator.cs</DependentUpon>
     </EmbeddedResource>
@@ -133,6 +136,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="PTAMModuleForm.resx">
+      <DependentUpon>PTAMModuleForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

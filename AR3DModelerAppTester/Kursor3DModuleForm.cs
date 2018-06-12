@@ -15,6 +15,7 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.Util;
 using Emgu.CV.Structure;
+using System.IO.Pipes;
 
 namespace AR3DModelerAppTester
 {
@@ -60,7 +61,9 @@ namespace AR3DModelerAppTester
             btnStartSending.Enabled = false;
             btnStopSending.Enabled = true;
 
-            kursor3DTestThread = new Thread(() => { Kursor3DTestThread(txtFolderLocation.Text); });
+            cursor3DSourceImage = txtFolderLocation.Text;
+
+            kursor3DTestThread = new Thread(Kursor3DTestThread);
             kursor3DTestThread.Start();
         }
 
@@ -75,8 +78,9 @@ namespace AR3DModelerAppTester
 
         // Kursor3D Testing thread setup
         Thread kursor3DTestThread;
+        string cursor3DSourceImage = string.Empty;
 
-        void Kursor3DTestThread(string source)
+        void Kursor3DTestThread()
         {
             // TODO: Implement actAsModelerModule
             ThreadHelperClass.SetText(this, lblStatusValue, "Thread started. Loading images from selected folder to memory...");
@@ -85,7 +89,7 @@ namespace AR3DModelerAppTester
 
             #region Test image loader
             Bitmap[] sourceImage;
-            string[] Files = Directory.GetFiles(source, "*.png");
+            string[] Files = Directory.GetFiles(cursor3DSourceImage, "*.png");
             sourceImage = new Bitmap[Files.Length];
             for (int fileNumber = 0; fileNumber < Files.Length; fileNumber++)
             {
@@ -104,6 +108,7 @@ namespace AR3DModelerAppTester
             {
                 Stopwatch overalPerformance = new Stopwatch();
                 overalPerformance.Start();
+
                 // Create preview of loaded image
                 ThreadHelperClass.SetImage(this, picImagePreview, sourceImage[position]);
                 ThreadHelperClass.SetText(this, lblStatusValue, "Now previewing image: " + Files[position]);
@@ -143,7 +148,7 @@ namespace AR3DModelerAppTester
                 MMFWatcher.Stop();
                 ThreadHelperClass.SetText(this, lblMMFPerformanceValue, MMFWatcher.ElapsedMilliseconds.ToString() + "ms");
 
-                ThreadHelperClass.SetText(this, lblStatusValue, "File writen. Waiting for Kursor3D Module to connect");
+                ThreadHelperClass.SetText(this, lblStatusValue, "File writen. Sending notification to Cursor 3D");
                 
                 // Notify Kursor3D Module about the image
                 SendReport("Kursor3DImageNotifier");
@@ -155,7 +160,7 @@ namespace AR3DModelerAppTester
                 {
                     receiverThread.Join();
                 }
-
+                receiverThread = null;
                 #region UI setter
                 ThreadHelperClass.SetText(this, lblStatusValue, "Module has finished the work. Writing the received values");
                 ThreadHelperClass.SetText(this, lblXPositionValue, x.ToString());
@@ -176,22 +181,34 @@ namespace AR3DModelerAppTester
         #region Sender function
         protected void SendReport(string PipeName)
         {
-            try
+            using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", PipeName, PipeDirection.Out))
             {
-                NamedPipeClient client = new NamedPipeClient(PipeName);
-                if (!client.CheckConnection())
+                pipeClient.Connect();
+                using (StreamWriter sw = new StreamWriter(pipeClient))
                 {
-                    client.ConnectToServer();
+                    sw.AutoFlush = true;
+                    sw.WriteLine("y");
                 }
+            }
 
-                client.WriteToServer((byte)'y');
-                client.WaitForPipeDrain();
-                client.DisconnectToServer();
-            }
-            catch (Exception err)
-            {
-                DefaultErrorWriter(err);
-            }
+            #region Old named pipe client notifier
+            //try
+            //{
+            //    NamedPipeClient client = new NamedPipeClient(PipeName);
+            //    if (!client.CheckConnection())
+            //    {
+            //        client.ConnectToServer();
+            //    }
+
+            //    client.WriteToServer((byte)'y');
+            //    client.WaitForPipeDrain();
+            //    client.DisconnectToServer();
+            //}
+            //catch (Exception err)
+            //{
+            //    DefaultErrorWriter(err);
+            //}
+            #endregion Old named pipe client notifier
         }
         #endregion Sender function
         #region Receiver thread
@@ -212,11 +229,31 @@ namespace AR3DModelerAppTester
         {
             try
             {
-                NamedPipesServer resultReceiver = new NamedPipesServer();
-                resultReceiver.CreateNewServerPipe("CursorProcessCompleteNotifier", NamedPipesServer.PipeDirection.DirectionInOut, NamedPipesServer.SendMode.MessageMode);
-                resultReceiver.WaitForConnection();
-                string receivedValues = resultReceiver.ReadMessage();
+                string receivedValues = string.Empty;
+
+                #region Reveiving code
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream("CursorProcessCompleteNotifier", PipeDirection.In))
+                {
+                    pipeServer.WaitForConnection();
+                    try
+                    {
+                        using (StreamReader sr = new StreamReader(pipeServer))
+                        {
+                            string temp;
+                            while ((temp = sr.ReadLine()) != null)
+                            {
+                                receivedValues = temp;
+                            }
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine("ERROR: {0}", e.Message);
+                    }
+                }
+                #endregion REceiving code
                 string[] receivedValue = receivedValues.Split('|');
+                
                 x = Convert.ToDouble(receivedValue[0]);
                 y = Convert.ToDouble(receivedValue[1]);
                 z = Convert.ToDouble(receivedValue[2]);
@@ -227,12 +264,6 @@ namespace AR3DModelerAppTester
                 kursor3DFindHandPerformance = Convert.ToInt64(receivedValue[5]);
                 kursor3DFindDepthPerformance = Convert.ToInt64(receivedValue[6]);
                 kursor3DgestureRecognitionPerformance = Convert.ToInt64(receivedValue[7]);
-
-                
-
-                resultReceiver.WaitForPipeDrain();
-                resultReceiver.Disconnect();
-                resultReceiver.ClosePipe();
             }
             catch (Exception err)
             {

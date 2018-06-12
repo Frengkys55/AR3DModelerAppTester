@@ -410,6 +410,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(759, 331);
             this.Controls.Add(this.lblNextImageLoadingPerformanceValue);
             this.Controls.Add(this.lblNextImageLoadingPerformance);
@@ -451,7 +452,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "Kursor3DModuleForm";
-            this.Text = "Kursor3DModuleForm";
+            this.Text = "Cursor 3D Module Tester";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Kursor3DModuleForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.picImagePreview)).EndInit();
             this.ResumeLayout(false);
