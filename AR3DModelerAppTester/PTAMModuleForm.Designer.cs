@@ -68,6 +68,11 @@
             this.lblPTAMModuleMemoryMappedFileReadingPerformance = new System.Windows.Forms.Label();
             this.lblPTAMModuleMemoryMappedFileReadingPerformanceValue = new System.Windows.Forms.Label();
             this.lblStatusValue = new System.Windows.Forms.Label();
+            this.txtSampleImagesFolderLocation = new System.Windows.Forms.TextBox();
+            this.btnSampleImagesFolderLocationSetter = new System.Windows.Forms.Button();
+            this.btnStartSending = new System.Windows.Forms.Button();
+            this.btnStopSending = new System.Windows.Forms.Button();
+            this.dlgSampleImagesFolderLocation = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.imgImagePreview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -105,7 +110,7 @@
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.lblStatus.Location = new System.Drawing.Point(12, 330);
+            this.lblStatus.Location = new System.Drawing.Point(12, 324);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(42, 13);
             this.lblStatus.TabIndex = 3;
@@ -456,17 +461,69 @@
             // 
             this.lblStatusValue.AutoSize = true;
             this.lblStatusValue.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.lblStatusValue.Location = new System.Drawing.Point(59, 330);
+            this.lblStatusValue.Location = new System.Drawing.Point(59, 324);
             this.lblStatusValue.Name = "lblStatusValue";
             this.lblStatusValue.Size = new System.Drawing.Size(0, 13);
             this.lblStatusValue.TabIndex = 38;
+            // 
+            // txtSampleImagesFolderLocation
+            // 
+            this.txtSampleImagesFolderLocation.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtSampleImagesFolderLocation.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSampleImagesFolderLocation.ForeColor = System.Drawing.SystemColors.MenuText;
+            this.txtSampleImagesFolderLocation.Location = new System.Drawing.Point(12, 245);
+            this.txtSampleImagesFolderLocation.Name = "txtSampleImagesFolderLocation";
+            this.txtSampleImagesFolderLocation.Size = new System.Drawing.Size(248, 22);
+            this.txtSampleImagesFolderLocation.TabIndex = 39;
+            // 
+            // btnSampleImagesFolderLocationSetter
+            // 
+            this.btnSampleImagesFolderLocationSetter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSampleImagesFolderLocationSetter.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSampleImagesFolderLocationSetter.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.btnSampleImagesFolderLocationSetter.Location = new System.Drawing.Point(266, 244);
+            this.btnSampleImagesFolderLocationSetter.Name = "btnSampleImagesFolderLocationSetter";
+            this.btnSampleImagesFolderLocationSetter.Size = new System.Drawing.Size(61, 23);
+            this.btnSampleImagesFolderLocationSetter.TabIndex = 40;
+            this.btnSampleImagesFolderLocationSetter.Text = "Set";
+            this.btnSampleImagesFolderLocationSetter.UseVisualStyleBackColor = true;
+            this.btnSampleImagesFolderLocationSetter.Click += new System.EventHandler(this.btnSampleImagesFolderLocationSetter_Click);
+            // 
+            // btnStartSending
+            // 
+            this.btnStartSending.Enabled = false;
+            this.btnStartSending.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStartSending.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.btnStartSending.Location = new System.Drawing.Point(12, 274);
+            this.btnStartSending.Name = "btnStartSending";
+            this.btnStartSending.Size = new System.Drawing.Size(150, 23);
+            this.btnStartSending.TabIndex = 41;
+            this.btnStartSending.Text = "Start sending";
+            this.btnStartSending.UseVisualStyleBackColor = true;
+            this.btnStartSending.Click += new System.EventHandler(this.btnStartSending_Click);
+            // 
+            // btnStopSending
+            // 
+            this.btnStopSending.Enabled = false;
+            this.btnStopSending.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStopSending.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.btnStopSending.Location = new System.Drawing.Point(174, 274);
+            this.btnStopSending.Name = "btnStopSending";
+            this.btnStopSending.Size = new System.Drawing.Size(153, 23);
+            this.btnStopSending.TabIndex = 42;
+            this.btnStopSending.Text = "Stop sending";
+            this.btnStopSending.UseVisualStyleBackColor = true;
             // 
             // PTAMModuleForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(819, 355);
+            this.ClientSize = new System.Drawing.Size(819, 346);
+            this.Controls.Add(this.btnStopSending);
+            this.Controls.Add(this.btnStartSending);
+            this.Controls.Add(this.btnSampleImagesFolderLocationSetter);
+            this.Controls.Add(this.txtSampleImagesFolderLocation);
             this.Controls.Add(this.lblStatusValue);
             this.Controls.Add(this.lblPTAMModuleMemoryMappedFileReadingPerformanceValue);
             this.Controls.Add(this.lblPTAMModuleMemoryMappedFileReadingPerformance);
@@ -511,6 +568,7 @@
             this.MaximizeBox = false;
             this.Name = "PTAMModuleForm";
             this.Text = "PTAM Module Tester";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PTAMModuleForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.imgImagePreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -558,5 +616,10 @@
         private System.Windows.Forms.Label lblPTAMModuleMemoryMappedFileReadingPerformance;
         private System.Windows.Forms.Label lblPTAMModuleMemoryMappedFileReadingPerformanceValue;
         private System.Windows.Forms.Label lblStatusValue;
+        private System.Windows.Forms.TextBox txtSampleImagesFolderLocation;
+        private System.Windows.Forms.Button btnSampleImagesFolderLocationSetter;
+        private System.Windows.Forms.Button btnStartSending;
+        private System.Windows.Forms.Button btnStopSending;
+        private System.Windows.Forms.FolderBrowserDialog dlgSampleImagesFolderLocation;
     }
 }

@@ -327,5 +327,10 @@ namespace AR3DModelerAppTester
             Console.WriteLine(e.StackTrace);
             Console.WriteLine("\nWish you good luck to solve it");
         }
+
+        private void Kursor3DModuleForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

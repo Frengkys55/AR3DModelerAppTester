@@ -454,6 +454,7 @@
             this.Name = "Kursor3DModuleForm";
             this.Text = "Cursor 3D Module Tester";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Kursor3DModuleForm_FormClosing);
+            this.Load += new System.EventHandler(this.Kursor3DModuleForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picImagePreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
