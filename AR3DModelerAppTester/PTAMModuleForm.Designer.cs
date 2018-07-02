@@ -513,6 +513,7 @@
             this.btnStopSending.TabIndex = 42;
             this.btnStopSending.Text = "Stop sending";
             this.btnStopSending.UseVisualStyleBackColor = true;
+            this.btnStopSending.Click += new System.EventHandler(this.btnStopSending_Click);
             // 
             // PTAMModuleForm
             // 

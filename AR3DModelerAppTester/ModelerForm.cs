@@ -85,7 +85,7 @@ namespace AR3DModelerAppTester
                         {
                             imageReceived = new Bitmap(ms);
                         }
-                        ThreadHelperClass.SetImage(this, previewImage, imageReceived);
+                        ThreadHelperClass.SetImage(this, imgTesterPreviewImage, imageReceived);
                     }
 
 
@@ -160,6 +160,11 @@ namespace AR3DModelerAppTester
             {
                 modeler.Abort();
             }
+        }
+
+        private void previewImage_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -24,27 +24,26 @@ namespace AR3DModelerAppTester
 
         #region Testing informations
 
-        
-
         #region Inter-Process Communication informations
 
         #region PTAM Named Pipe sending channel
 
-        string PTAMModuleNamedPipeSendingChannel = string.Empty;
-        string PTAMModuleNamedPipeReceivingChannel = string.Empty;
+        string PTAMModuleNamedPipeSendingChannel = "PTAMHUBNotifierChannel";
+        string PTAMModuleNamedPipeReceivingChannel = "PTAMModelerNotifierChannel";
 
         #endregion PTAM Named Pipe sending channel
 
         #region PTAM Memory-Mapped File name
 
-        string PTAMModuleSourceImageFileName = string.Empty;
+        string PTAMModuleSourceImageFileName = "PTAMSourceImage";
 
         #endregion PTAM Memory-Mapped File name
-        
+
         #endregion Inter-Process Communication informations
 
         #region Source images
-        Mat[] PTAMSourceImages;
+        Bitmap[] PTAMSourceImages;
+        string[] fileNames;
         Thread mainFunction;
         #endregion Source images
 
@@ -80,19 +79,21 @@ namespace AR3DModelerAppTester
 
         #region PTAM Module performance informations
 
-        long PTAMOverallPerformance = 0;
-        long PTAMTrackingPerformance = 0;
-        long PTAMMappingPerformance = 0;
-        long PTAMImageConversionPerformance = 0;
+        long PTAMModuleOverallPerformance           = 0;
+        long PTAMReceivingPerformance               = 0;
+        long PTAMOverallPerformance                 = 0;
+        long PTAMTrackingPerformance                = 0;
+        long PTAMMappingPerformance                 = 0;
+        long PTAMImageConversionPerformance         = 0;
         long PTAMMemoryMappedFileReadingPerformance = 0;
 
         #endregion PTAM Module performance informations
 
         #region Tester performance informations
 
-        long testerOverallPerformance = 0;
-        long testerMemoryMappedFilePerformance = 0;
-        long testerImageConversionPerformance = 0;
+        long testerOverallPerformance           = 0;
+        long testerMemoryMappedFilePerformance  = 0;
+        long testerImageConversionPerformance   = 0;
 
         #endregion Tester performance informations
 
@@ -109,6 +110,7 @@ namespace AR3DModelerAppTester
         #endregion Thread objects
 
         #region Other settings
+        bool isExitRequested = false;
         bool isSampleImageFolderEmpty = false;
         int imagePosition = 0;
         #endregion Other settings
@@ -221,11 +223,22 @@ namespace AR3DModelerAppTester
             lblStatusValue.Text = "Starting sending thread...";
             StartMainFunction();
             lblStatusValue.Text = "Thread started.";
+
+            btnStartSending.Enabled = false;
+            btnStopSending.Enabled = true;
+        }
+
+        private void btnStopSending_Click(object sender, EventArgs e)
+        {
+            if (mainFunction.IsAlive)
+            {
+                mainFunction.Abort();
+            }
         }
 
         void SourceImagesLoader(string folderLocation)
         {
-            string[] fileNames = Directory.GetFiles(folderLocation, "*.png");
+            fileNames = Directory.GetFiles(folderLocation, "*.png");
 
             if (fileNames.Length == 0)
             {
@@ -242,13 +255,13 @@ namespace AR3DModelerAppTester
                 }
             }
 
-            PTAMSourceImages = new Mat[fileNames.Length];
+            PTAMSourceImages = new Bitmap[fileNames.Length];
             for (int imageNumber = 0; imageNumber < fileNames.Length; imageNumber++)
             {
-                PTAMSourceImages[imageNumber] = new Mat(fileNames[imageNumber], ImreadModes.AnyColor);
+                PTAMSourceImages[imageNumber] = new Bitmap(fileNames[imageNumber]);
             }
 
-            ThreadHelperClass.SetImage(this, imgImagePreview, PTAMSourceImages[0].Bitmap);
+            ThreadHelperClass.SetImage(this, imgImagePreview, PTAMSourceImages[0]);
         }
 
         void StartMainFunction()
@@ -281,21 +294,21 @@ namespace AR3DModelerAppTester
             Thread.Sleep(100);
             ThreadHelperClass.SetText(this, lblStatusValue, "Preparing for sending...");
 
-            bool isExitRequested = false;
             MMF mappedFile = new MMF();
-            mappedFile.CreateNewFile("PTAMHUBNotifierChannel", 10000000);
+            mappedFile.CreateNewFile(PTAMModuleSourceImageFileName, 10000000);
             int position = 0;
 
             do
             {
-                Stopwatch overalPerformance = new Stopwatch();
-                overalPerformance.Start();
+                Stopwatch overallPerformance = new Stopwatch();
+                overallPerformance.Start();
 
                 // Create preview of loaded image
-                ThreadHelperClass.SetImage(this, imgImagePreview, sourceImage[position]);
-                ThreadHelperClass.SetText(this, lblStatusValue, "Now previewing image: " + Files[position]);
+                ThreadHelperClass.SetImage(this, imgImagePreview, PTAMSourceImages[position]);
+                ThreadHelperClass.SetText(this, lblStatusValue, "Now previewing image: " + fileNames[position]);
                 position++;
-                if (position == Files.Length)
+
+                if (position == fileNames.Length)
                 {
                     position = 0;
                 }
@@ -306,31 +319,32 @@ namespace AR3DModelerAppTester
                 #endregion Receiver threat
 
                 ThreadHelperClass.SetText(this, lblStatusValue, "Writing image to memory-mapped file");
+                
+                #region Image converter
 
                 // Convert image to array and save to tempImage
                 Stopwatch imageConversionWatcher = new Stopwatch();
                 imageConversionWatcher.Start();
 
-                #region Image converter
                 byte[] tempImage;
                 using (var ms = new MemoryStream())
                 {
-                    PTAMSourceImages[position].Bitmap.Save(ms, PTAMSourceImages[position].Bitmap.RawFormat);
+                    PTAMSourceImages[position].Save(ms, PTAMSourceImages[position].RawFormat);
                     tempImage = ms.ToArray();
                 }
+                imageConversionWatcher.Stop();
+                testerImageConversionPerformance = imageConversionWatcher.ElapsedMilliseconds;
                 #endregion Image converter
 
-                imageConversionWatcher.Stop();
-                ThreadHelperClass.SetText(this, lblImageConversionPerformanceValue, imageConversionWatcher.ElapsedMilliseconds.ToString() + "ms");
-
+                #region Memory-Mapped File writing
                 Stopwatch MMFWatcher = new Stopwatch();
                 MMFWatcher.Start();
                 // Write the image to memory-mapped file
                 mappedFile.AddInformation(Convert.ToBase64String(tempImage));
                 MMFWatcher.Stop();
-                ThreadHelperClass.SetText(this, lblMemoryMappedFilePerformanceValue, MMFWatcher.ElapsedMilliseconds.ToString() + "ms");
-
-                ThreadHelperClass.SetText(this, lblStatusValue, "File writen. Sending notification to Cursor 3D");
+                testerMemoryMappedFilePerformance = MMFWatcher.ElapsedMilliseconds;
+                #endregion Memory-Mapped File writing
+                ThreadHelperClass.SetText(this, lblStatusValue, "File writen. Sending notification to PTAM Module");
 
                 // Notify Kursor3D Module about the image
                 SendReport(PTAMModuleNamedPipeSendingChannel);
@@ -343,10 +357,9 @@ namespace AR3DModelerAppTester
                     receiverThread.Join();
                 }
                 receiverThread = null;
-                #region UI setter
-
                 ThreadHelperClass.SetText(this, lblStatusValue, "Module has finished the work. Writing the received values");
 
+                #region UI setter
                 #region Pose
 
                 #region Position
@@ -360,12 +373,21 @@ namespace AR3DModelerAppTester
                 ThreadHelperClass.SetText(this, lblOrientationZValue, receivedZOrientation.ToString());
                 #endregion Orientation
                 #endregion Pose
-                overalPerformance.Stop();
-                ThreadHelperClass.SetText(this, lblOveralPerformanceValue, overalPerformance.ElapsedMilliseconds.ToString() + "ms");
-                ThreadHelperClass.SetText(this, lblKursor3DOverallPerformanceValue, kursor3DOverallPerformance.ToString() + "ms");
-                ThreadHelperClass.SetText(this, lblKursor3DFindHandThreadPerformanceValue, kursor3DFindHandPerformance.ToString() + "ms");
-                ThreadHelperClass.SetText(this, lblKursor3DFindDepthThreadPerformanceValue, kursor3DFindDepthPerformance.ToString() + "ms");
-                ThreadHelperClass.SetText(this, lblKursor3DGestureRecognitionThreadPerformanceValue, kursor3DgestureRecognitionPerformance.ToString() + "ms");
+
+                #region Points
+                ThreadHelperClass.SetText(this, lblTotalPointCreatedValue, totalPointsCreated.ToString());
+                #endregion Points
+                overallPerformance.Stop();
+                testerOverallPerformance = overallPerformance.ElapsedMilliseconds;
+                ThreadHelperClass.SetText(this, lblOverallPerformanceValue, testerOverallPerformance.ToString() + "ms");
+                ThreadHelperClass.SetText(this, lblMemoryMappedFilePerformanceValue, testerMemoryMappedFilePerformance.ToString() + "ms");
+                ThreadHelperClass.SetText(this, lblImageConversionPerformanceValue, testerImageConversionPerformance.ToString() + "ms");
+
+                ThreadHelperClass.SetText(this, lblPTAMModuleOverallPerformanceValue, PTAMModuleOverallPerformance.ToString() + "ms");
+                ThreadHelperClass.SetText(this, lblPTAMModuleTrackingPerformanceValue, PTAMTrackingPerformance.ToString() + "ms");
+                ThreadHelperClass.SetText(this, lblPTAMModuleMappingPerformanceValue, PTAMMappingPerformance.ToString() + "ms");
+                ThreadHelperClass.SetText(this, lblPTAMModuleImageConversionPerformanceValue, PTAMImageConversionPerformance.ToString() + "ms");
+                ThreadHelperClass.SetText(this, lblPTAMModuleMemoryMappedFileReadingPerformanceValue, PTAMMemoryMappedFileReadingPerformance.ToString() + "ms");
                 #endregion UI setter
             } while (!isExitRequested);
 
@@ -384,25 +406,6 @@ namespace AR3DModelerAppTester
                     sw.WriteLine("y");
                 }
             }
-
-            #region Old named pipe client notifier
-            //try
-            //{
-            //    NamedPipeClient client = new NamedPipeClient(PipeName);
-            //    if (!client.CheckConnection())
-            //    {
-            //        client.ConnectToServer();
-            //    }
-
-            //    client.WriteToServer((byte)'y');
-            //    client.WaitForPipeDrain();
-            //    client.DisconnectToServer();
-            //}
-            //catch (Exception err)
-            //{
-            //    DefaultErrorWriter(err);
-            //}
-            #endregion Old named pipe client notifier
         }
         #endregion Sender function
         #region Receiver thread
@@ -447,11 +450,13 @@ namespace AR3DModelerAppTester
 
                 totalPointsCreated = Convert.ToInt32(receivedValue[6]);
 
-                PTAMOverallPerformance = Convert.ToInt64(receivedValue[7]);
-                PTAMTrackingPerformance = Convert.ToInt64(receivedValue[8]);
-                PTAMMappingPerformance = Convert.ToInt64(receivedValue[9]);
-                PTAMImageConversionPerformance = Convert.ToInt64(receivedValue[10]);
-                PTAMMemoryMappedFileReadingPerformance = Convert.ToInt64(receivedValue[11]);
+                PTAMModuleOverallPerformance            = Convert.ToInt64(receivedValue[7]);
+                PTAMOverallPerformance                  = Convert.ToInt64(receivedValue[8]);
+                PTAMReceivingPerformance                = Convert.ToInt64(receivedValue[9]);
+                PTAMTrackingPerformance                 = Convert.ToInt64(receivedValue[10]);
+                PTAMMappingPerformance                  = Convert.ToInt64(receivedValue[11]);
+                PTAMImageConversionPerformance          = Convert.ToInt64(receivedValue[12]);
+                PTAMMemoryMappedFileReadingPerformance  = Convert.ToInt64(receivedValue[13]);
             }
             catch (Exception err)
             {
@@ -503,6 +508,11 @@ namespace AR3DModelerAppTester
         private void PTAMModuleForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             iconAnimation.Abort();
+            StopMainFunction();
+            if (mainFunction.IsAlive)
+            {
+                isExitRequested = true;
+            }
 
             // Dispose old images and load new images if PTAMSourceImages is not null
             if (PTAMSourceImages != null)
@@ -513,5 +523,7 @@ namespace AR3DModelerAppTester
                 }
             }
         }
+
+        
     }
 }
